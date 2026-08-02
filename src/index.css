@@ -1,0 +1,7 @@
+@import "tailwindcss";
+
+/* Custom minimal palette – Tailwind already provides the needed colors */
+/* Ensure a 1px border style for cards and inputs */
+.border-slim {
+  @apply border border-slate-200;
+}
