@@ -1,8 +1,6 @@
 // src/App.jsx
 import { useState } from 'react';
 import Header from './components/Header.jsx';
-import DepartmentGrid from './components/DepartmentGrid.jsx';
-import FloatingButton from './components/FloatingButton.jsx';
 import ComplaintModal from './components/ComplaintModal.jsx';
 import SuccessModal from './components/SuccessModal.jsx';
 import TrackComplaintModal from './components/TrackComplaintModal.jsx';
@@ -27,7 +25,7 @@ const departments = [
   'Transport & Bus Fleet',
   'Hostel & Dining Services',
   'Library',
-  'Placement Cell'
+  'Placement Cell',
   'Campus Maintenance & Facilities',
 ];
 
@@ -37,7 +35,6 @@ function App() {
   const [isTrackModalOpen, setIsTrackModalOpen] = useState(false);
   const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
-  const [currentView, setCurrentView] = useState('menu'); // 'menu' or 'departments'
   const [complaintId, setComplaintId] = useState('');
   const [selectedDept, setSelectedDept] = useState('');
   const [complaints, setComplaints] = useState([]);
@@ -78,7 +75,6 @@ function App() {
     setComplaintId(mockId);
     setIsModalOpen(false);
     setIsSuccessOpen(true);
-    setCurrentView('menu'); // return to main menu after success
   };
 
   const closeSuccess = () => {
@@ -90,26 +86,11 @@ function App() {
     <div className="min-h-screen bg-slate-100 flex flex-col items-center p-4">
       <Header onTrackClick={() => setIsTrackModalOpen(true)} />
       
-      {currentView === 'menu' ? (
-        <DashboardMenu 
-          onRaiseComplaint={() => setCurrentView('departments')}
-          onTrackComplaint={() => setIsTrackModalOpen(true)}
-          onHistory={() => setIsHistoryModalOpen(true)}
-        />
-      ) : (
-        <div className="w-full flex flex-col items-center">
-          <div className="w-full max-w-lg mx-auto mb-4">
-            <button 
-              onClick={() => setCurrentView('menu')}
-              className="text-emerald-600 hover:text-emerald-700 font-medium flex items-center gap-1"
-            >
-              ← Back to Main Menu
-            </button>
-          </div>
-          <DepartmentGrid departments={departments} onCardClick={openModal} />
-          <FloatingButton onClick={() => openModal()} />
-        </div>
-      )}
+      <DashboardMenu 
+        onRaiseComplaint={() => openModal()}
+        onTrackComplaint={() => setIsTrackModalOpen(true)}
+        onHistory={() => setIsHistoryModalOpen(true)}
+      />
 
       {isPrivacyModalOpen && (
         <PrivacyConsentModal

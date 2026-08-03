@@ -9,13 +9,6 @@ export default function Header({ onTrackClick }) {
         <h1 className="text-2xl font-semibold text-slate-900">
           College Complaints
         </h1>
-        <button
-          onClick={onTrackClick}
-          className="flex items-center gap-1.5 text-sm font-medium text-emerald-700 hover:text-emerald-800 bg-emerald-100 hover:bg-emerald-200 px-3 py-1.5 rounded-full transition-colors active:scale-95"
-        >
-          <Search size={16} />
-          Track
-        </button>
       </div>
       <p className="text-sm text-slate-600">
         Fast, Anonymous & Transparent Student Grievance System
