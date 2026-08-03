@@ -25,6 +25,7 @@ const departments = [
   'Transport & Bus Fleet',
   'Hostel & Dining Services',
   'Library',
+  'Placement Cell'
   'Campus Maintenance & Facilities',
 ];
 
