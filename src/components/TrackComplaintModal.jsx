@@ -1,27 +1,14 @@
 // src/components/TrackComplaintModal.jsx
 import React, { useState } from 'react';
-import { X, Search, Clock, CheckCircle } from 'lucide-react';
+import { X, Search } from 'lucide-react';
 
-export default function TrackComplaintModal({ onClose, complaints }) {
+export default function TrackComplaintModal({ onClose }) {
   const [trackingId, setTrackingId] = useState('');
-  const [result, setResult] = useState(null);
-  const [error, setError] = useState('');
 
   const handleSearch = (e) => {
     e.preventDefault();
     if (!trackingId.trim()) return;
-
-    const found = complaints.find(
-      (c) => c.id.toLowerCase() === trackingId.trim().toLowerCase()
-    );
-
-    if (found) {
-      setResult(found);
-      setError('');
-    } else {
-      setResult(null);
-      setError('Complaint not found. Please check your Tracking ID.');
-    }
+    // The user requested it should only ask for the complaint ID and not do anything.
   };
 
   return (
@@ -35,7 +22,7 @@ export default function TrackComplaintModal({ onClose, complaints }) {
         </button>
         <h2 className="text-xl font-semibold text-slate-900 mb-4">Track Complaint</h2>
 
-        <form onSubmit={handleSearch} className="mb-6">
+        <form onSubmit={handleSearch}>
           <label className="block text-sm font-medium text-slate-700 mb-1">
             Enter Tracking ID
           </label>
@@ -54,31 +41,7 @@ export default function TrackComplaintModal({ onClose, complaints }) {
               <Search size={20} />
             </button>
           </div>
-          {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
         </form>
-
-        {result && (
-          <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 animate-fade-in">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-semibold px-2 py-1 bg-emerald-100 text-emerald-700 rounded-full flex items-center gap-1">
-                <CheckCircle size={14} /> Registered
-              </span>
-              <span className="text-xs text-slate-500">{new Date(result.date).toLocaleDateString()}</span>
-            </div>
-            
-            <h3 className="font-semibold text-slate-900 mb-1">{result.subject}</h3>
-            <p className="text-xs text-slate-500 font-medium mb-3">{result.dept}</p>
-            
-            <div className="bg-white border border-slate-200 rounded p-3 text-sm text-slate-700 mb-3 whitespace-pre-wrap">
-              {result.description}
-            </div>
-
-            <div className="flex items-center gap-2 text-sm text-amber-600 font-medium bg-amber-50 p-2 rounded border border-amber-200">
-              <Clock size={16} />
-              Status: Action Pending
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
