@@ -34,7 +34,7 @@ export default function Auth() {
     <div className="min-h-screen bg-slate-100 flex items-center justify-center p-4">
       <div className="bg-white w-full max-w-md rounded-2xl p-8 shadow-xl animate-fade-in">
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-slate-900">College Portal</h1>
+          <h1 className="text-2xl font-bold text-slate-900">College Complaint Portal</h1>
           <p className="text-sm text-slate-600 mt-1">
             {view === 'login' && 'Sign in to your account'}
             {view === 'register' && 'Create a new account'}
@@ -96,6 +96,10 @@ export default function Auth() {
           <form onSubmit={handleRegister} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">User Name</label>
+              <input type="text" required className="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-emerald-500" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Register Number</label>
               <input type="text" required className="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-emerald-500" />
             </div>
             <div>
