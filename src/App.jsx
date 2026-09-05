@@ -1,5 +1,6 @@
 // src/App.jsx
 import { useState } from 'react';
+import { api } from './services/api.js';
 import Header from './components/Header.jsx';
 import ComplaintModal from './components/ComplaintModal.jsx';
 import SuccessModal from './components/SuccessModal.jsx';
@@ -27,6 +28,7 @@ const departments = [
   'Library',
   'Placement Cell',
   'Campus Maintenance & Facilities',
+  'Student Misbehavior'
 ];
 
 function App() {
@@ -56,25 +58,31 @@ function App() {
 
   const closeModal = () => setIsModalOpen(false);
 
-  const handleSubmit = (data) => {
-    // Generate a mock complaint ID
-    const mockId = `#CMP-${Math.floor(100000 + Math.random() * 900000)}`;
-
-    // Save to mock database
-    setComplaints((prev) => [
-      ...prev,
-      {
-        id: mockId,
-        dept: data.dept,
+  const handleSubmit = async (data) => {
+    try {
+      const response = await api.createComplaint({
+        studentId: "STU001", // Using a default student ID
+        department: data.dept,
+        category: "General",
         subject: data.subject,
         description: data.description,
-        date: new Date().toISOString(),
-      },
-    ]);
+        imageData: data.imageData
+      });
 
-    setComplaintId(mockId);
-    setIsModalOpen(false);
-    setIsSuccessOpen(true);
+      setComplaintId(response.complaintCode);
+      localStorage.setItem('lastComplaintId', response.complaintCode);
+
+      setComplaints((prev) => [
+        ...prev,
+        response
+      ]);
+
+      setIsModalOpen(false);
+      setIsSuccessOpen(true);
+    } catch (error) {
+      console.error("Failed to create complaint", error);
+      alert("Failed to submit complaint. Please check your backend.");
+    }
   };
 
   const closeSuccess = () => {
@@ -85,8 +93,8 @@ function App() {
   return (
     <div className="min-h-screen bg-slate-100 flex flex-col items-center p-4">
       <Header onTrackClick={() => setIsTrackModalOpen(true)} />
-      
-      <DashboardMenu 
+
+      <DashboardMenu
         onRaiseComplaint={() => openModal()}
         onTrackComplaint={() => setIsTrackModalOpen(true)}
         onHistory={() => setIsHistoryModalOpen(true)}

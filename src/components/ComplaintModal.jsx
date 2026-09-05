@@ -28,7 +28,14 @@ export default function ComplaintModal({ departments, initialDept, onClose, onSu
     setFiles((prev) => prev.filter((_, index) => index !== indexToRemove));
   };
 
-  const submitForm = (e) => {
+  const toBase64 = file => new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = error => reject(error);
+  });
+
+  const submitForm = async (e) => {
     e.preventDefault();
     if (!dept || !subject || !description) return;
     if (dept === 'Hostel & Dining Services' && !hostelType) return;
@@ -40,7 +47,12 @@ export default function ComplaintModal({ departments, initialDept, onClose, onSu
       finalDept = `${dept} (Bus: ${busNumber})`;
     }
 
-    onSubmit({ dept: finalDept, subject, description, files });
+    let imageData = null;
+    if (files.length > 0) {
+      imageData = await toBase64(files[0]);
+    }
+
+    onSubmit({ dept: finalDept, subject, description, imageData });
   };
 
   return (

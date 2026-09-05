@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { X, Search } from 'lucide-react';
 
 export default function TrackComplaintModal({ onClose }) {
-  const [trackingId, setTrackingId] = useState('');
+  const [trackingId, setTrackingId] = useState(() => localStorage.getItem('lastComplaintId') || '');
 
   const handleSearch = (e) => {
     e.preventDefault();
