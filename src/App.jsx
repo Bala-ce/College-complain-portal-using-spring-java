@@ -1,4 +1,5 @@
 // src/App.jsx
+<<<<<<< HEAD
 import { useState } from 'react';
 import { api } from './services/api.js';
 import Header from './components/Header.jsx';
@@ -134,6 +135,20 @@ function App() {
         <HistoryModal onClose={() => setIsHistoryModalOpen(false)} />
       )}
     </div>
+=======
+import AdminDashboard from './components/AdminDashboard.jsx';
+
+function App() {
+  const handleLogout = () => {
+    console.log('Logout clicked');
+  };
+
+  return (
+    <AdminDashboard 
+      adminUser={{ name: "Dr. Sharma", role: "ADMIN", department: "All Departments" }}
+      onLogout={handleLogout}
+    />
+>>>>>>> AdminDashboard-features
   );
 }
 
