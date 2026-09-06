@@ -3,22 +3,25 @@ import React, { useEffect, useState } from 'react';
 import { X, History, ChevronDown, ChevronUp } from 'lucide-react';
 import { api } from '../services/api.js';
 
-export default function HistoryModal({ onClose }) {
+export default function HistoryModal({ onClose, studentEmail }) {
   const [complaints, setComplaints] = useState([]);
   const [expandedId, setExpandedId] = useState(null);
-  const studentId = "STU001"; // Hardcoded for now
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchComplaints = async () => {
+      if (!studentEmail) return;
       try {
-        const data = await api.getComplaintsByStudent(studentId);
+        const data = await api.getComplaintsByStudent(studentEmail);
         setComplaints(data || []);
       } catch (error) {
         console.error("Error fetching history:", error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchComplaints();
-  }, []);
+  }, [studentEmail]);
 
   const toggleExpand = (id) => {
     setExpandedId(prev => prev === id ? null : id);
@@ -40,7 +43,11 @@ export default function HistoryModal({ onClose }) {
           <h2 className="text-xl font-semibold text-slate-900">Complaint History</h2>
         </div>
 
-        {complaints.length === 0 ? (
+        {loading ? (
+          <div className="text-center py-8">
+            <p className="text-slate-400">Loading your complaints…</p>
+          </div>
+        ) : complaints.length === 0 ? (
           <div className="text-center py-8">
             <p className="text-slate-500 font-medium">There are no previous complaints.</p>
           </div>

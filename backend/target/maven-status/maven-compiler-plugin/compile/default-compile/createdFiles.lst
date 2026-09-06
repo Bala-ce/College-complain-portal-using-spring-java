@@ -1,0 +1,6 @@
+com\portal\complaint\repository\UserRepository.class
+com\portal\complaint\dto\RegisterRequest.class
+com\portal\complaint\entity\User.class
+com\portal\complaint\entity\User$UserBuilder.class
+com\portal\complaint\controller\AuthController.class
+com\portal\complaint\dto\LoginRequest.class

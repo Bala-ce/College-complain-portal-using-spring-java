@@ -17,6 +17,52 @@ const handleResponse = async (response) => {
 };
 
 export const api = {
+  // --- Auth Endpoints ---
+  login: async (credentials) => {
+    const response = await fetch(`http://192.168.29.226:8080/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(credentials),
+    });
+    return handleResponse(response);
+  },
+
+  register: async (userData) => {
+    const response = await fetch(`http://192.168.29.226:8080/api/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(userData),
+    });
+    return handleResponse(response);
+  },
+
+  changePassword: async (email, newPassword) => {
+    const response = await fetch(`http://192.168.29.226:8080/api/auth/change-password`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, newPassword }),
+    });
+    return handleResponse(response);
+  },
+
+  forgotPassword: async (email, newPassword) => {
+    const response = await fetch(`http://192.168.29.226:8080/api/auth/forgot-password`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, newPassword }),
+    });
+    return handleResponse(response);
+  },
+
+  updateProfile: async (profileData) => {
+    const response = await fetch(`http://192.168.29.226:8080/api/auth/profile`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(profileData),
+    });
+    return handleResponse(response);
+  },
+
   // 1. POST /api/complaints -> Save a new complaint
   createComplaint: async (complaintData) => {
     const response = await fetch(BASE_URL, {
@@ -35,9 +81,9 @@ export const api = {
     return handleResponse(response);
   },
 
-  // 3. GET /api/complaints/student/{studentId} -> Fetch complaints by student ID
-  getComplaintsByStudent: async (studentId) => {
-    const response = await fetch(`${BASE_URL}/student/${studentId}`);
+  // 3. GET /api/complaints/student?email={email} -> Fetch complaints by student email
+  getComplaintsByStudent: async (studentEmail) => {
+    const response = await fetch(`${BASE_URL}/student?email=${encodeURIComponent(studentEmail)}`);
     return handleResponse(response);
   },
 

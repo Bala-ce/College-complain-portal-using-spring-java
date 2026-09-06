@@ -1,5 +1,10 @@
 D:\Complaint portal project\backend\src\main\java\com\portal\complaint\ComplaintApplication.java
 D:\Complaint portal project\backend\src\main\java\com\portal\complaint\config\CorsConfig.java
+D:\Complaint portal project\backend\src\main\java\com\portal\complaint\controller\AuthController.java
 D:\Complaint portal project\backend\src\main\java\com\portal\complaint\controller\ComplaintController.java
+D:\Complaint portal project\backend\src\main\java\com\portal\complaint\dto\LoginRequest.java
+D:\Complaint portal project\backend\src\main\java\com\portal\complaint\dto\RegisterRequest.java
 D:\Complaint portal project\backend\src\main\java\com\portal\complaint\entity\Complaint.java
+D:\Complaint portal project\backend\src\main\java\com\portal\complaint\entity\User.java
 D:\Complaint portal project\backend\src\main\java\com\portal\complaint\repository\ComplaintRepository.java
+D:\Complaint portal project\backend\src\main\java\com\portal\complaint\repository\UserRepository.java

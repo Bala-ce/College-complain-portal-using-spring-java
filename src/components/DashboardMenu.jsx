@@ -19,19 +19,6 @@ export default function DashboardMenu({ onRaiseComplaint, onTrackComplaint, onHi
       </button>
 
       <button
-        onClick={onTrackComplaint}
-        className="flex items-center gap-4 bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md hover:border-emerald-300 transition-all active:scale-95 group"
-      >
-        <div className="bg-emerald-50 text-emerald-600 p-3 rounded-xl group-hover:bg-emerald-600 group-hover:text-white transition-colors">
-          <Search size={28} />
-        </div>
-        <div className="text-left flex-1">
-          <h2 className="text-xl font-semibold text-slate-900 mb-1">Track the Complaints</h2>
-          <p className="text-sm text-slate-500">Check the status of an existing complaint</p>
-        </div>
-      </button>
-
-      <button
         onClick={onHistory}
         className="flex items-center gap-4 bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md hover:border-emerald-300 transition-all active:scale-95 group"
       >

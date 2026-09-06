@@ -37,10 +37,10 @@ public class ComplaintController {
         return ResponseEntity.ok(complaints);
     }
 
-    // 3. GET /api/complaints/student/{studentId} -> Fetch complaints by student ID
-    @GetMapping("/student/{studentId}")
-    public ResponseEntity<List<Complaint>> getComplaintsByStudent(@PathVariable String studentId) {
-        List<Complaint> complaints = complaintRepository.findByStudentId(studentId);
+    // 3. GET /api/complaints/student?email={email} -> Fetch complaints by student email
+    @GetMapping("/student")
+    public ResponseEntity<List<Complaint>> getComplaintsByStudent(@RequestParam String email) {
+        List<Complaint> complaints = complaintRepository.findByStudentId(email);
         return ResponseEntity.ok(complaints);
     }
 
