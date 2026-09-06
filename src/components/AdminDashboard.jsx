@@ -39,12 +39,14 @@ export default function AdminDashboard({
     const total      = complaints.length;
     const pending    = complaints.filter(c => c.status === 'PENDING').length;
     const inProgress = complaints.filter(c => c.status === 'IN_PROGRESS').length;
+    const resolved   = complaints.filter(c => c.status === 'RESOLVED').length;
+    const rejected   = complaints.filter(c => c.status === 'REJECTED').length;
     const delayed    = complaints.filter(c => {
-      if (c.status === 'RESOLVED') return false;
+      if (c.status === 'RESOLVED' || c.status === 'REJECTED') return false;
       const days = Math.floor((Date.now() - new Date(c.createdAt)) / 86400000);
       return days > 3;
     }).length;
-    return { total, pending, inProgress, delayed };
+    return { total, pending, inProgress, resolved, rejected, delayed };
   }, [complaints]);
 
   // ── Filter & Search ──
@@ -59,8 +61,9 @@ export default function AdminDashboard({
       if (activeFilter === 'Pending')        return c.status === 'PENDING';
       if (activeFilter === 'In Progress')    return c.status === 'IN_PROGRESS';
       if (activeFilter === 'Resolved')       return c.status === 'RESOLVED';
+      if (activeFilter === 'Rejected')       return c.status === 'REJECTED';
       if (activeFilter === 'Delayed (>3 Days)') {
-        if (c.status === 'RESOLVED') return false;
+        if (c.status === 'RESOLVED' || c.status === 'REJECTED') return false;
         const days = Math.floor((Date.now() - new Date(c.createdAt)) / 86400000);
         return days > 3;
       }
@@ -108,7 +111,7 @@ export default function AdminDashboard({
 
   const renderStatusBadge = (status, createdAt) => {
     const days = daysSince(createdAt);
-    if (status !== 'RESOLVED' && days > 3) {
+    if (status !== 'RESOLVED' && status !== 'REJECTED' && days > 3) {
       return (
         <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-red-50 text-red-700 border border-red-200 flex items-center gap-1.5 w-fit">
           <AlertCircle size={14} /> Delayed
@@ -120,6 +123,8 @@ export default function AdminDashboard({
         return <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1.5 w-fit"><CheckCircle size={14} /> Resolved</span>;
       case 'IN_PROGRESS':
         return <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200 flex items-center gap-1.5 w-fit"><Clock size={14} /> In Progress</span>;
+      case 'REJECTED':
+        return <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-red-50 text-red-700 border border-red-200 flex items-center gap-1.5 w-fit"><X size={14} /> Rejected</span>;
       case 'PENDING':
       default:
         return <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200 flex items-center gap-1.5 w-fit"><AlertCircle size={14} /> Pending</span>;
@@ -158,25 +163,29 @@ export default function AdminDashboard({
       <main className="flex-1 p-6 max-w-7xl mx-auto w-full">
 
         {/* STATS */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
           <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
             <p className="text-sm font-medium text-slate-500 mb-1">Total Complaints</p>
             <p className="text-3xl font-bold text-slate-900">{loading ? '–' : stats.total}</p>
           </div>
           <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
             <p className="text-sm font-medium text-slate-500 mb-1">Pending Review</p>
-            <p className="text-3xl font-bold text-slate-900">{loading ? '–' : stats.pending}</p>
+            <p className="text-3xl font-bold text-amber-600">{loading ? '–' : stats.pending}</p>
           </div>
           <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
             <p className="text-sm font-medium text-slate-500 mb-1">In Progress</p>
-            <p className="text-3xl font-bold text-slate-900">{loading ? '–' : stats.inProgress}</p>
+            <p className="text-3xl font-bold text-blue-600">{loading ? '–' : stats.inProgress}</p>
           </div>
-          <div className="bg-red-50 p-5 rounded-xl border border-red-300 shadow-sm">
+          <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+            <p className="text-sm font-medium text-slate-500 mb-1">Resolved</p>
+            <p className="text-3xl font-bold text-emerald-600">{loading ? '–' : stats.resolved}</p>
+          </div>
+          <div className="bg-red-50 p-5 rounded-xl border border-red-200 shadow-sm">
             <div className="flex items-center gap-2 mb-1">
-              <AlertCircle size={16} className="text-red-600" />
-              <p className="text-sm font-medium text-red-700">SLA Alert (&gt;3 Days)</p>
+              <X size={16} className="text-red-600" />
+              <p className="text-sm font-medium text-red-700">Rejected</p>
             </div>
-            <p className="text-3xl font-bold text-red-700">{loading ? '–' : stats.delayed}</p>
+            <p className="text-3xl font-bold text-red-700">{loading ? '–' : stats.rejected}</p>
           </div>
         </div>
 
@@ -184,14 +193,18 @@ export default function AdminDashboard({
         <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm mb-6 flex flex-col lg:flex-row gap-4 justify-between items-start lg:items-center">
           <div className="flex flex-wrap items-center gap-2">
             <Filter size={18} className="text-slate-400 mr-1" />
-            {['All', 'Pending', 'In Progress', 'Delayed (>3 Days)', 'Resolved'].map(filter => (
+            {['All', 'Pending', 'In Progress', 'Delayed (>3 Days)', 'Resolved', 'Rejected'].map(filter => (
               <button
                 key={filter}
                 onClick={() => setActiveFilter(filter)}
                 className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
                   activeFilter === filter
-                    ? 'bg-emerald-600 text-white shadow-sm'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    ? filter === 'Rejected'
+                      ? 'bg-red-600 text-white shadow-sm'
+                      : 'bg-emerald-600 text-white shadow-sm'
+                    : filter === 'Rejected'
+                      ? 'bg-red-50 text-red-600 hover:bg-red-100 border border-red-200'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                 }`}
               >
                 {filter}

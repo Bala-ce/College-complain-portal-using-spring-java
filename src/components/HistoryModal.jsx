@@ -63,11 +63,13 @@ export default function HistoryModal({ onClose, studentEmail }) {
                     <div className="flex items-center gap-2 mb-1">
                       <span className="font-semibold text-slate-900">{c.complaintCode}</span>
                       <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                        c.status === 'PENDING' ? 'bg-amber-100 text-amber-700' :
-                        c.status === 'RESOLVED' ? 'bg-emerald-100 text-emerald-700' :
+                        c.status === 'PENDING'     ? 'bg-amber-100 text-amber-700' :
+                        c.status === 'RESOLVED'    ? 'bg-emerald-100 text-emerald-700' :
+                        c.status === 'IN_PROGRESS' ? 'bg-blue-100 text-blue-700' :
+                        c.status === 'REJECTED'    ? 'bg-red-100 text-red-700' :
                         'bg-slate-200 text-slate-700'
                       }`}>
-                        {c.status}
+                        {c.status === 'IN_PROGRESS' ? 'In Progress' : c.status.charAt(0) + c.status.slice(1).toLowerCase()}
                       </span>
                     </div>
                     <p className="text-sm font-medium text-slate-800">{c.subject}</p>
@@ -86,9 +88,19 @@ export default function HistoryModal({ onClose, studentEmail }) {
                     </div>
                     
                     {c.officialReply && (
-                      <div className="bg-emerald-50 p-3 rounded border border-emerald-100">
-                        <h4 className="text-xs font-semibold text-emerald-800 uppercase tracking-wider mb-1">Official Response</h4>
-                        <p className="text-sm text-emerald-900">{c.officialReply}</p>
+                      <div className={`p-3 rounded border ${
+                        c.status === 'REJECTED'
+                          ? 'bg-red-50 border-red-100'
+                          : 'bg-emerald-50 border-emerald-100'
+                      }`}>
+                        <h4 className={`text-xs font-semibold uppercase tracking-wider mb-1 ${
+                          c.status === 'REJECTED' ? 'text-red-800' : 'text-emerald-800'
+                        }`}>
+                          {c.status === 'REJECTED' ? 'Rejection Notice' : 'Official Response'}
+                        </h4>
+                        <p className={`text-sm ${
+                          c.status === 'REJECTED' ? 'text-red-900' : 'text-emerald-900'
+                        }`}>{c.officialReply}</p>
                       </div>
                     )}
 

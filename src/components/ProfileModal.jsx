@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, User, Lock, Save, Phone } from 'lucide-react';
+import { X, User, Lock, Save, Phone, Shield, Hash, Pencil, XCircle } from 'lucide-react';
 import { api } from '../services/api.js';
 
 const departments = [
@@ -21,21 +21,32 @@ const batches = ['2021-2025', '2022-2026', '2023-2027', '2024-2028', '2025-2029'
 
 export default function ProfileModal({ studentUser, onClose, onProfileUpdated }) {
   const [view, setView] = useState('profile'); // 'profile' | 'changePassword'
+  const [isEditing, setIsEditing] = useState(false); // view mode by default
 
   // Profile fields
-  const [fullName,       setFullName]       = useState(studentUser.fullName || '');
-  const [mobileNumber,   setMobileNumber]   = useState(studentUser.mobileNumber || '');
+  const [fullName, setFullName] = useState(studentUser.fullName || '');
+  const [mobileNumber, setMobileNumber] = useState(studentUser.mobileNumber || '');
   const [registerNumber, setRegisterNumber] = useState(studentUser.registerNumber || '');
-  const [department,     setDepartment]     = useState(studentUser.department || '');
-  const [batch,          setBatch]          = useState(studentUser.batch || '');
-  const [profileMsg,     setProfileMsg]     = useState('');
+  const [department, setDepartment] = useState(studentUser.department || '');
+  const [batch, setBatch] = useState(studentUser.batch || '');
+  const [profileMsg, setProfileMsg] = useState('');
   const [profileLoading, setProfileLoading] = useState(false);
 
+  // Cancel editing — revert to original values
+  const handleCancelEdit = () => {
+    setFullName(studentUser.fullName || '');
+    setMobileNumber(studentUser.mobileNumber || '');
+    setDepartment(studentUser.department || '');
+    setBatch(studentUser.batch || '');
+    setProfileMsg('');
+    setIsEditing(false);
+  };
+
   // Change password fields
-  const [newPassword,     setNewPassword]     = useState('');
+  const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [pwMsg,           setPwMsg]           = useState('');
-  const [pwLoading,       setPwLoading]       = useState(false);
+  const [pwMsg, setPwMsg] = useState('');
+  const [pwLoading, setPwLoading] = useState(false);
 
   const handleSaveProfile = async (e) => {
     e.preventDefault();
@@ -43,13 +54,14 @@ export default function ProfileModal({ studentUser, onClose, onProfileUpdated })
     setProfileLoading(true);
     try {
       const updated = await api.updateProfile({
-        email:        studentUser.email,
+        email: studentUser.email,
         fullName,
         mobileNumber,
         department,
         batch,
       });
       setProfileMsg('✓ Profile saved successfully!');
+      setIsEditing(false);
       if (onProfileUpdated) onProfileUpdated(updated);
     } catch (err) {
       setProfileMsg('Error: ' + (err.message || 'Failed to save profile.'));
@@ -106,21 +118,19 @@ export default function ProfileModal({ studentUser, onClose, onProfileUpdated })
         <div className="flex border-b border-slate-200 flex-shrink-0">
           <button
             onClick={() => { setView('profile'); setProfileMsg(''); }}
-            className={`flex-1 py-3 text-sm font-medium flex items-center justify-center gap-2 transition-colors ${
-              view === 'profile'
-                ? 'border-b-2 border-emerald-600 text-emerald-700'
-                : 'text-slate-500 hover:text-slate-700'
-            }`}
+            className={`flex-1 py-3 text-sm font-medium flex items-center justify-center gap-2 transition-colors ${view === 'profile'
+              ? 'border-b-2 border-emerald-600 text-emerald-700'
+              : 'text-slate-500 hover:text-slate-700'
+              }`}
           >
             <User size={16} /> My Profile
           </button>
           <button
             onClick={() => { setView('changePassword'); setPwMsg(''); }}
-            className={`flex-1 py-3 text-sm font-medium flex items-center justify-center gap-2 transition-colors ${
-              view === 'changePassword'
-                ? 'border-b-2 border-emerald-600 text-emerald-700'
-                : 'text-slate-500 hover:text-slate-700'
-            }`}
+            className={`flex-1 py-3 text-sm font-medium flex items-center justify-center gap-2 transition-colors ${view === 'changePassword'
+              ? 'border-b-2 border-emerald-600 text-emerald-700'
+              : 'text-slate-500 hover:text-slate-700'
+              }`}
           >
             <Lock size={16} /> Change Password
           </button>
@@ -133,77 +143,155 @@ export default function ProfileModal({ studentUser, onClose, onProfileUpdated })
           {view === 'profile' && (
             <form onSubmit={handleSaveProfile} className="p-6 space-y-4">
 
+              {/* View / Edit mode banner */}
+              {!isEditing && (
+                <div className="flex items-center justify-between bg-slate-50 border border-slate-200 rounded-xl px-4 py-3">
+                  <div className="flex items-center gap-2 text-slate-500">
+                    <Lock size={14} />
+                    <span className="text-xs font-medium">Profile is in view-only mode</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => { setProfileMsg(''); setIsEditing(true); }}
+                    className="flex items-center gap-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 hover:bg-emerald-100 px-3 py-1.5 rounded-lg transition-colors"
+                  >
+                    <Pencil size={13} /> Edit Profile
+                  </button>
+                </div>
+              )}
+
+              {isEditing && (
+                <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
+                  <Pencil size={14} className="text-amber-600" />
+                  <span className="text-xs font-medium text-amber-700">You are now editing your profile</span>
+                </div>
+              )}
+
+              {/* Full Name */}
               <div>
                 <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Full Name</label>
                 <input
                   type="text"
                   value={fullName}
                   onChange={e => setFullName(e.target.value)}
-                  className="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
+                  readOnly={!isEditing}
+                  className={`w-full border rounded-lg p-2.5 text-sm outline-none transition-colors ${isEditing
+                    ? 'border-emerald-400 focus:ring-2 focus:ring-emerald-500 bg-white text-slate-900'
+                    : 'border-slate-200 bg-slate-50 text-slate-600 cursor-default'
+                    }`}
                   placeholder="Your full name"
                 />
               </div>
 
+              {/* Mobile Number */}
               <div>
-                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">
-                  Mobile Number
-                </label>
+                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Mobile Number</label>
                 <div className="relative">
                   <Phone size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                   <input
                     type="tel"
                     value={mobileNumber}
                     onChange={e => setMobileNumber(e.target.value)}
-                    className="w-full border border-slate-300 rounded-lg pl-9 pr-3 py-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
+                    readOnly={!isEditing}
+                    className={`w-full border rounded-lg pl-9 pr-3 py-2.5 text-sm outline-none transition-colors ${isEditing
+                      ? 'border-emerald-400 focus:ring-2 focus:ring-emerald-500 bg-white text-slate-900'
+                      : 'border-slate-200 bg-slate-50 text-slate-600 cursor-default'
+                      }`}
                     placeholder="e.g. 9876543210"
                     maxLength={10}
                   />
                 </div>
               </div>
 
+              {/* Register Number — always locked */}
               <div>
                 <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Register Number</label>
-                <input
-                  type="text"
-                  value={registerNumber}
-                  readOnly
-                  className="w-full border border-slate-200 rounded-lg p-2.5 text-sm bg-slate-50 text-slate-500 cursor-not-allowed"
-                />
-                <p className="text-xs text-slate-400 mt-1">Register number cannot be changed after registration.</p>
+                <div className="relative">
+                  <Hash size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <Lock size={13} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-300" />
+                  <input
+                    type="text"
+                    value={registerNumber}
+                    readOnly
+                    className="w-full border border-slate-200 rounded-lg pl-9 pr-8 py-2.5 text-sm bg-slate-50 text-slate-700 font-mono cursor-not-allowed select-none tracking-wider"
+                    placeholder="Not set"
+                  />
+                </div>
+                <p className="text-xs text-slate-400 mt-1 flex items-center gap-1">
+                  <Lock size={11} /> Register number is permanent and cannot be changed.
+                </p>
               </div>
 
+              {/* Email — always locked */}
               <div>
                 <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Email</label>
-                <input
-                  type="email"
-                  value={studentUser.email}
-                  readOnly
-                  className="w-full border border-slate-200 rounded-lg p-2.5 text-sm bg-slate-50 text-slate-500 cursor-not-allowed"
-                />
+                <div className="relative">
+                  <Lock size={13} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-300" />
+                  <input
+                    type="email"
+                    value={studentUser.email}
+                    readOnly
+                    className="w-full border border-slate-200 rounded-lg p-2.5 pr-8 text-sm bg-slate-50 text-slate-600 cursor-not-allowed"
+                  />
+                </div>
+                <p className="text-xs text-slate-400 mt-1 flex items-center gap-1">
+                  <Lock size={11} /> Email address cannot be changed.
+                </p>
               </div>
 
+              {/* Department */}
               <div>
                 <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Department</label>
-                <select
-                  value={department}
-                  onChange={e => setDepartment(e.target.value)}
-                  className="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none bg-white"
-                >
-                  <option value="">-- Select Department --</option>
-                  {departments.map(d => <option key={d} value={d}>{d}</option>)}
-                </select>
+                {isEditing ? (
+                  <select
+                    value={department}
+                    onChange={e => setDepartment(e.target.value)}
+                    className="w-full border border-emerald-400 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none bg-white text-slate-900"
+                  >
+                    <option value="">-- Select Department --</option>
+                    {departments.map(d => <option key={d} value={d}>{d}</option>)}
+                  </select>
+                ) : (
+                  <input
+                    type="text"
+                    value={department || 'Not set'}
+                    readOnly
+                    className="w-full border border-slate-200 rounded-lg p-2.5 text-sm bg-slate-50 text-slate-600 cursor-default"
+                  />
+                )}
               </div>
 
+              {/* Batch */}
               <div>
                 <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Batch</label>
-                <select
-                  value={batch}
-                  onChange={e => setBatch(e.target.value)}
-                  className="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none bg-white"
-                >
-                  <option value="">-- Select Batch --</option>
-                  {batches.map(b => <option key={b} value={b}>{b}</option>)}
-                </select>
+                {isEditing ? (
+                  <select
+                    value={batch}
+                    onChange={e => setBatch(e.target.value)}
+                    className="w-full border border-emerald-400 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none bg-white text-slate-900"
+                  >
+                    <option value="">-- Select Batch --</option>
+                    {batches.map(b => <option key={b} value={b}>{b}</option>)}
+                  </select>
+                ) : (
+                  <input
+                    type="text"
+                    value={batch || 'Not set'}
+                    readOnly
+                    className="w-full border border-slate-200 rounded-lg p-2.5 text-sm bg-slate-50 text-slate-600 cursor-default"
+                  />
+                )}
+              </div>
+
+              {/* Privacy Notice */}
+              <div className="flex items-start gap-3 bg-slate-50 border border-slate-200 rounded-xl p-3.5">
+                <Shield size={18} className="text-emerald-600 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="text-xs font-semibold text-slate-700 mb-0.5">Your Privacy is Protected</p>
+                  <p className="text-xs text-slate-500 leading-relaxed">
+                    The information provided in your profile is used solely for identification and communication purposes within the College Complaint Portal. Your personal details will never be shared with the Faculty members while Raising a Complaint.
+                  </p>
+                </div>
               </div>
 
               {profileMsg && (
@@ -212,14 +300,26 @@ export default function ProfileModal({ studentUser, onClose, onProfileUpdated })
                 </p>
               )}
 
-              <button
-                type="submit"
-                disabled={profileLoading}
-                className="w-full bg-emerald-600 text-white font-medium rounded-lg py-2.5 hover:bg-emerald-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-60"
-              >
-                <Save size={16} />
-                {profileLoading ? 'Saving…' : 'Save Profile'}
-              </button>
+              {/* Action buttons */}
+              {isEditing && (
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={handleCancelEdit}
+                    className="flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors"
+                  >
+                    <XCircle size={16} /> Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={profileLoading}
+                    className="flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-medium text-white bg-emerald-600 border border-emerald-600 rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-60"
+                  >
+                    <Save size={16} />
+                    {profileLoading ? 'Saving…' : 'Save Changes'}
+                  </button>
+                </div>
+              )}
             </form>
           )}
 
